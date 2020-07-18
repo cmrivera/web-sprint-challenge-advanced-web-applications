@@ -12,6 +12,8 @@ const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
   const history = useHistory();
+  const [posting, setPosting] = useState(false);
+  const [colorToPost, setColorToPost] = useState(initialColor);
   const [sucMsg, setSucMsg] = useState("");
 
   const editColor = (color) => {
@@ -57,7 +59,7 @@ const ColorList = ({ colors, updateColors }) => {
       .post("/api/colors", colorToPost)
       .then((res) => {
         updateColors();
-        console.log("posting", response);
+        console.log("posting", res);
         setSucMsg(res.statusText);
       })
       .catch((err) => {
@@ -68,6 +70,21 @@ const ColorList = ({ colors, updateColors }) => {
   return (
     <div className="colors-wrap">
       <p>colors</p>
+      <button
+        onClick={() => {
+          history.push("/Login");
+        }}
+      >
+        Log Out
+      </button>{" "}
+      <br></br>
+      <p
+        onCLick={() => {
+          setPosting(true);
+        }}
+      >
+        <button> Add New Color</button>
+      </p>
       <ul>
         {colors.map((color) => (
           <li key={color.color} onClick={() => editColor(color)}>
@@ -115,13 +132,45 @@ const ColorList = ({ colors, updateColors }) => {
             />
           </label>
           <div className="button-row">
-            <button type="submit">save</button>
-            <button onClick={() => setEditing(false)}>cancel</button>
+            <button type="submit">Submit and Save New Information</button>
+            <button onClick={() => setEditing(false)}>
+              Cancel Edited Information
+            </button>
           </div>
         </form>
       )}
       <div className="spacer" />
       {/* stretch - build another form here to add a color */}
+      <form onSubmit={postColor}>
+        <legend> Add New Color!</legend>
+        <label>
+          Color Name:
+          <input
+            onChange={(e) =>
+              setColorToPost({
+                ...colorToPost,
+                color: e.target.value,
+              })
+            }
+          />
+        </label>
+        <label>
+          hex code:
+          <input
+            onChange={(e) =>
+              setColorToPost({
+                ...colorToPost,
+                code: { hex: e.target.value },
+              })
+            }
+          />
+        </label>
+        <div>
+          <button type="submit"> Add New Color</button>
+          <button onClick={() => setPosting(false)}> Cancel New Color</button>
+          <span>{sucMsg}</span>
+        </div>
+      </form>
     </div>
   );
 };
